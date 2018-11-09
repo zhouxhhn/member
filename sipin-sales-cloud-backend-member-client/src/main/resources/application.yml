@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: sales-member-consumer
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+  zipkin:
+      base-url: http://localhost:8006
+server:
+  port: 7100
+
+#开启Feign对Hystrix的支持
+feign:
+  hystrix:
+    enabled: true
+  httpclient:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 10000
+
+
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 4000
+
+

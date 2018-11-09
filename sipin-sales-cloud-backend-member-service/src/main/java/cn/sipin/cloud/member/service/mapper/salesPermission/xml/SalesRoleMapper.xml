@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.salesPermission.SalesRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesPermission.SalesRole">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="children_system" property="childrenSystem" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="scope" property="scope" />
+        <result column="creator" property="creator" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="indexRolesMap" type="cn.sipin.cloud.member.pojo.pojo.salesPermission.SalesRole">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="children_system" property="childrenSystem" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="scope" property="scope" />
+        <result column="creator" property="creator" />
+        <result column="creator_name" property="creatorName" />
+        <result column="created_at" property="createdAt" />
+        <association property="salesShop" column="scope" select="selectSalesShop"/>
+    </resultMap>
+
+    <select id="selectSalesShop" resultMap="cn.sipin.cloud.member.service.mapper.sales.SalesShopMapper.BaseResultMap">
+        SELECT * FROM sales_shop WHERE id = #{scope}
+    </select>
+
+    <select id="selectRolesByUserId" resultMap="BaseResultMap">
+        select roles.* from sales_role roles left join sales_user_role urole on roles.id = urole.role_id
+        where roles.status=0 and  urole.user_id=#{id}
+    </select>
+
+
+
+    <select id="selectRolesPage" resultMap="indexRolesMap">
+        select role.*,suser.name as creator_name from sales_role role left join sales_user suser on role.creator = suser.id
+        left join sales_shop shop on role.scope = shop.id
+        <where>
+            <if test="shopId !=null">
+                AND role.type =0 or (role.type =1 and role.scope =#{shopId})
+            </if>
+            <if test="request !=null and request.getName() != null">
+                <bind name="nameLike" value="'%' + request.getName() + '%'"/>
+                AND `role`.`name` LIKE #{nameLike}
+            </if>
+            <if test="request !=null and request.getCode() != null">
+                AND `role`.`code` = #{request.code}
+            </if>
+            <if test="request !=null and request.getScope() != null">
+                <bind name="shopNameLike" value="'%' + request.getScope() + '%'"/>
+                AND `shop`.`name` LIKE #{shopNameLike} or `shop`.`name` is null
+            </if>
+        </where>
+        ORDER BY `role`.`id` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectfrontRolesPage" resultMap="indexRolesMap">
+        select role.*,suser.name as creator_name from sales_role role left join sales_user suser on role.creator = suser.id
+        left join sales_shop shop on role.scope = shop.id
+        <where>
+            `role`.`children_system` = 0
+            <if test="shopId !=null">
+                AND role.type =0 or (role.type =1 and role.scope =#{shopId})
+            </if>
+
+        </where>
+        ORDER BY `role`.`id` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+</mapper>

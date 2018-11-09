@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.salesPermission.SalesPermissionActionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesPermission.SalesPermissionAction">
+        <id column="id" property="id" />
+        <result column="action_url" property="actionUrl" />
+        <result column="display_name" property="displayName" />
+        <result column="group_id" property="groupId" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <select id="hasPermission" resultMap="BaseResultMap">
+        select paction.* from sales_permission_action paction where paction.id in
+        (select prole.permission_id from sales_permission_role prole where prole.role_id in
+        (select urole.role_id from sales_user_role urole where urole.user_id=#{userId})
+        and prole.role_id in (select id from sales_role role where role.status = 0))
+    </select>
+
+</mapper>

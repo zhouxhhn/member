@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.sales.SalesUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesUser.SalesUser">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="empno" property="empno" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="shop_code" property="shopCode" />
+        <result column="type" property="type" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="UserShopResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesUser.SalesUser">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="empno" property="empno" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="shop_code" property="shopCode" />
+        <result column="shop_name" property="shopName" />
+        <result column="type" property="type" />
+        <result column="created_at" property="createdAt" />
+        <collection property="roleList" column="id" select="cn.sipin.cloud.member.service.mapper.salesPermission.SalesRoleMapper.selectRolesByUserId"/>
+    </resultMap>
+
+    <select id="getUserInfoByToken" resultType="map" >
+        select u.id as userId,IFNULL(u.name,'') as userName,IFNULL(shop.code,'') as shopCode,IFNULL(shop.source_id,'') as shopSourceId,
+        IFNULL(shop.name,'') as shopName,
+        IFNULL(agency.code,'') as agencyCode,IFNULL(agency.name,'') as agencyName,
+        IFNULL(agency.discount,'1') as agencyDiscount,IFNULL(agency.outer_code,'') as outerCode
+        from sales_user u left join sales_shop shop on u.shop_code = shop.code
+        left join sales_agency agency on agency.code = shop.agency_code
+        <where>
+            u.id=#{userId}
+        </where>
+    </select>
+
+    <select id="getUserListByShop" resultMap="UserShopResultMap">
+        select suser.*,shop.name as shop_name from sales_user suser  left join sales_shop shop on suser.shop_code = shop.code
+        <where>
+            suser.shop_code = #{shopCode}
+            <if test="request !=null and request.getUserName() != null">
+                <bind name="nameLike" value="'%' + request.getUserName() + '%'"/>
+                AND suser.name LIKE #{nameLike}
+            </if>
+            <if test="request !=null and request.getEmpno() != null">
+                AND suser.empno = #{request.empno}
+            </if>
+        </where>
+        ORDER BY `suser`.`created_at` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="getUserInfoListBySystem" resultMap="UserShopResultMap">
+        select suser.* ,shop.name as shop_name from sales_user suser  left join sales_shop shop on suser.shop_code = shop.code
+        <where>
+            <if test="request !=null and request.getUserName() != null">
+                <bind name="nameLike" value="'%' + request.getUserName() + '%'"/>
+                 suser.name LIKE #{nameLike}
+            </if>
+            <if test="request !=null and request.getEmpno() != null">
+                AND suser.empno = #{request.empno}
+            </if>
+            <if test="request !=null and request.getShopCode() != null">
+                AND suser.shop_code = #{request.shopCode}
+            </if>
+        </where>
+        ORDER BY `suser`.`created_at` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectRolesByUserId" resultMap="cn.sipin.cloud.member.service.mapper.salesPermission.SalesRoleMapper.BaseResultMap">
+        select roles.* from sales_role roles left join sales_user_role urole on roles.id = urole.role_id
+        where roles.status=0 and urole.user_id=#{userId}
+    </select>
+
+</mapper>

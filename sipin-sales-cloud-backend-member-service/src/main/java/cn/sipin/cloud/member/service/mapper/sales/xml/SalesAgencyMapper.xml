@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.sales.SalesAgencyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesAgency.SalesAgency">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="grade" property="grade" />
+        <result column="address" property="address" />
+        <result column="phone" property="phone" />
+        <result column="contacts" property="contacts" />
+        <result column="balance" property="balance" />
+        <result column="discount" property="discount" />
+        <result column="license_img_url" property="licenseImgUrl" />
+        <result column="license_img_secret" property="licenseImgSecret" />
+        <result column="outer_code" property="outerCode" />
+        <result column="remark" property="remark" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <select id="getAgencyInfo" resultMap="BaseResultMap">
+        select agency.* from sales_agency agency
+        left join sales_shop shop on agency.code = shop.agency_code
+        left join sales_user suser on suser.shop_code = shop.code
+        <where>
+            suser.id=#{userId}
+        </where>
+    </select>
+
+
+    <select id="selectAgencyPage" resultMap="BaseResultMap">
+        SELECT `agency`.* FROM `sales_agency` AS `agency`
+        <where>
+            <if test="request !=null and request.getName() != null">
+                <bind name="nameLike" value="'%' + request.getName() + '%'"/>
+                AND `agency`.`name` LIKE #{nameLike}
+            </if>
+            <if test="request !=null and request.getCode() != null">
+                AND `agency`.`code` = #{request.code}
+            </if>
+            <if test="request !=null and request.getGrade() != null">
+                AND `agency`.`grade` = #{request.grade}
+            </if>
+        </where>
+        ORDER BY `agency`.`id` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+</mapper>

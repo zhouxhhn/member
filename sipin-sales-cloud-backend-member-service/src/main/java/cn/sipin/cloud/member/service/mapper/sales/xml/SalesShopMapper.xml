@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.sales.SalesShopMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesShop.SalesShop">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="source_id" property="sourceId" />
+        <result column="name" property="name" />
+        <result column="address" property="address" />
+        <result column="phone" property="phone" />
+        <result column="agency_code" property="agencyCode" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <resultMap id="AgencyResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesShop.SalesShop">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="source_id" property="sourceId" />
+        <result column="name" property="name" />
+        <result column="address" property="address" />
+        <result column="phone" property="phone" />
+        <result column="agency_code" property="agencyCode" />
+        <result column="created_at" property="createdAt" />
+        <result column="agency_id" property="agencyId" />
+        <result column="agency_name" property="agencyName" />
+    </resultMap>
+
+
+    <select id="selectShopPage" resultMap="AgencyResultMap">
+        select shop.*,agency.id as agency_id,agency.name as agency_name from sales_shop shop
+        left join sales_agency agency on shop.agency_code = agency.code
+        <where>
+            <if test="code != null">
+                AND agency.code=#{code}
+            </if>
+
+            <if test="request !=null and request.getName() != null">
+                <bind name="nameLike" value="'%' + request.getName() + '%'"/>
+                AND `shop`.`name` LIKE #{nameLike}
+            </if>
+            <if test="request !=null and request.getCode() != null">
+                AND `shop`.`code` = #{request.code}
+            </if>
+            <if test="request !=null and request.getAgencyName() != null">
+                <bind name="agencyNameLike" value="'%' + request.getAgencyName() + '%'"/>
+                AND `agency`.`name` LIKE #{agencyNameLike}
+            </if>
+        </where>
+        ORDER BY `shop`.`created_at` DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+</mapper>

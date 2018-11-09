@@ -1,0 +1,12 @@
+spring:
+  application:
+      name: sales-member-service
+  datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.zaxxer.hikari.HikariDataSource
+      url: jdbc:mysql://localhost:3306/sipin-sales-member?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+      username: root
+      password: root
+      hikari:
+        connection-timeout: 5000
+        maximum-pool-size: 25

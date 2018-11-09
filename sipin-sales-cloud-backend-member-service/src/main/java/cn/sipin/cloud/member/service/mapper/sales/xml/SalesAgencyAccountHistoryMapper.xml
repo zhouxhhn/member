@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sipin.cloud.member.service.mapper.sales.SalesAgencyAccountHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sipin.cloud.member.pojo.pojo.salesAgency.SalesAgencyAccountHistory">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="serial_no" property="serialNo" />
+        <result column="agency_id" property="agencyId" />
+        <result column="points" property="points" />
+        <result column="terminal_points" property="terminalPoints" />
+        <result column="balance" property="balance" />
+        <result column="terminal_balance" property="terminalBalance" />
+        <result column="operator" property="operator" />
+        <result column="type" property="type" />
+        <result column="small_type" property="smallType" />
+        <result column="create_at" property="createAt" />
+    </resultMap>
+
+</mapper>
